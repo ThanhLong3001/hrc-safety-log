@@ -197,106 +197,12 @@ async function getRobotStatus(
 // GET ALL EVENTS
 // ======================================================
 
+const readSafetyEvents = require("./eventReader").createEventReader({ provider, contract });
 async function getAllSafetyEvents() {
-
-    try {
-
-        const filter =
-            contract.filters
-                .SafetyEventRecorded();
-
-        // Contract được deploy tại block 11852711.
-        // Chỉ cần đọc event từ block deploy đến latest,
-        // không cần quét toàn bộ lịch sử Sepolia.
-        const DEPLOYMENT_BLOCK = 11852711;
-
-        const latestBlock =
-            await provider.getBlockNumber();
-
-        console.log(
-            `Reading SafetyEventRecorded: ${DEPLOYMENT_BLOCK} -> ${latestBlock}`
-        );
-
-        const logs =
-            await contract.queryFilter(
-                filter,
-                DEPLOYMENT_BLOCK,
-                latestBlock
-            );
-
-        const events = [];
-
-        for (const log of logs) {
-
-            const eventId =
-                log.args.eventId;
-
-            const result =
-                await contract
-                    .getSafetyEvent(
-                        eventId
-                    );
-
-            events.push({
-
-                eventId:
-                    result[0],
-
-                deviceId:
-                    result[1],
-
-                timestamp:
-                    Number(
-                        result[2]
-                    ),
-
-                dataHash:
-                    result[3],
-
-                riskLevel:
-                    Number(
-                        result[4]
-                    ),
-
-                recordedAt:
-                    Number(
-                        result[5]
-                    ),
-
-                transactionHash:
-                    log.transactionHash,
-
-                blockNumber:
-                    log.blockNumber
-            });
-        }
-
-        return {
-
-            success: true,
-
-            count:
-                events.length,
-
-            events
-        };
-
-    } catch (error) {
-
-        console.error(
-            "getAllSafetyEvents error:",
-            error
-        );
-
-        return {
-
-            success: false,
-
-            error:
-                error.shortMessage
-                ||
-                error.message
-        };
+    try { return await readSafetyEvents(); }
+    catch (error) {
+        console.error("getAllSafetyEvents error:", error.shortMessage || error.message);
+        return { success: false, error: error.shortMessage || error.message };
     }
 }
 

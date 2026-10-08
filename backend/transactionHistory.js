@@ -1,13 +1,10 @@
 async function getTransactionHistory({ provider, contract, deploymentBlock = 11852711, chunkSize = 2000 }) {
     const latest = await provider.getBlockNumber();
     const transactions = new Map();
-    for (let from = deploymentBlock; from <= latest; from += chunkSize) {
-        const to = Math.min(from + chunkSize - 1, latest);
-        const results = await Promise.all([
-            contract.queryFilter(contract.filters.SafetyEventRecorded(), from, to),
-            contract.queryFilter(contract.filters.RobotUnlocked(), from, to),
-            contract.queryFilter(contract.filters.EmergencyStopTriggered(), from, to)
-        ]);
+    const { readLogs } = require("./logReader");
+    const results = await Promise.all(["SafetyEventRecorded", "RobotUnlocked", "EmergencyStopTriggered"].map(name =>
+        readLogs({ contract, name, latestBlock: latest, deploymentBlock, chunkSize })));
+    {
         for (const [index, logs] of results.entries()) {
             for (const log of logs) {
                 let entry = transactions.get(log.transactionHash);

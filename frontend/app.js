@@ -54,7 +54,7 @@ function setState(id, state) {
 }
 async function request(path, options = {}) {
     const response = await fetch(API_URL + path, {
-        ...options, signal: AbortSignal.timeout(20000)
+        ...options, signal: AbortSignal.timeout(["/api/events", "/api/transactions"].includes(path) ? 90000 : 20000)
     });
     const data = await response.json();
     if (!response.ok || data.success !== true) {
