@@ -1,0 +1,37 @@
+# Node modules
+node_modules/
+**/node_modules/
+
+# Environment secrets
+.env
+**/.env
+
+# Hardhat generated files
+blockchain/cache/
+blockchain/artifacts/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# VS Code optional local settings
+.vscode/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+#Github
+node_modules/
+.env
+.env.*
+!.env.example
+artifacts/
+cache/
+dist/
+coverage/
